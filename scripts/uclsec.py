@@ -37,9 +37,9 @@ for url in urls:
 
     targets = [x.text for x in tree.find("person").findall("author")]
     for t in targets:
-        trans[t] = targets[0]
+        trans[t] = targets[-1]
     targetset = set(targets)
-    Core.add(targets[0])
+    Core.add(targets[-1])
 
     for pub in tree:
             if pub.tag == "r":

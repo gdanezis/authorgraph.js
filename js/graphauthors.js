@@ -1,8 +1,10 @@
 
+var dispatch = d3.dispatch("showpapers");
+
 function graph_authors(elemID, url, width, height){
 
 var fisheye = d3.fisheye.circular()
-      .radius(340)
+      .radius(240)
       .distortion(6);
 
 
@@ -10,7 +12,7 @@ var color = d3.scale.category20();
 
 var force = d3.layout.force()
     .charge(-120)
-    .linkDistance(30)
+    .linkDistance(10)
     .size([width, height]);
 
 var svg = d3.select(elemID)
@@ -25,7 +27,7 @@ d3.json(url, function(error, graph) {
       .nodes(graph.nodes)
       .links(graph.links);
 
-  var steps = 500;
+  var steps = 1000;
   force.start();
   for (var i = steps; i > 0; --i) force.tick();
   force.stop();
@@ -58,7 +60,7 @@ d3.json(url, function(error, graph) {
                 .attr("class", "label")
                 .style("fill", "#555")
                 .style("font-family", "Helvetica")
-                .style("font-size", "0.5em")
+                .style("font-size", "1em")
                 .attr("text-anchor","middle")
                 .attr("pointer-events", "none")
                 .attr("fill-opacity", function(d) { if (d.group == 1) {return 1.0; } else {return 0.0; } })
@@ -66,6 +68,8 @@ d3.json(url, function(error, graph) {
 
   node.append("title")
       .text(function(d) { return d.name; });
+
+  var active = true;
 
   var redraw = function(){
     node.each(function(d) { d.fisheye = fisheye(d); })
@@ -79,26 +83,32 @@ d3.json(url, function(error, graph) {
         .attr("x2", function(d) { return d.target.fisheye.x; })
         .attr("y2", function(d) { return d.target.fisheye.y; });
 
-
+    var keys = [];
     texts.attr("transform", function(d) {
           return "translate(" + (d.fisheye.x) + "," + (d.fisheye.y - 20) + ")"; })
-        .style("font-size", function(d) { return "" + (d.fisheye.z * 0.5) + "em"; })
+        .style("font-size", function(d) { if (d.group == 1) {return "1em";} else {return "" + (d.fisheye.z * 0.5) + "em";} })
         .attr("fill-opacity", function(d) { if (d.group == 1) { return 1.0; } else { return (0.15 * d.fisheye.z); } })
         .text(function(d) {  
-          if (d.group == 1 || d.fisheye.z >= 4.4) { return d.name; } else { return ""; }  });
+          if (d.group == 1) { return d.name; }; if ( d.fisheye.z >= 4.4) {keys.push(d.name); return d.name;} else { return ""; }  });
 
+    dispatch.showpapers(keys);
   }
 
   svg.on("mousemove", function() {
-    fisheye.focus(d3.mouse(this));
+    if (active) fisheye.focus(d3.mouse(this));
     redraw();
   });
 
   svg.on("mouseout", function() {
-    fisheye.focus(-100000, -100000);
+    if (active) fisheye.focus(-100000, -100000);
     redraw();
   });
 
+  svg.on("click", function() {
+    console.log("Click!");
+    active = !active;
+    redraw();
+  });
 
   redraw();
 });

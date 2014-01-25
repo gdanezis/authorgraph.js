@@ -1,5 +1,21 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+
+    <title>UCL Information Security: Collaborators and Venues</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="sticky-footer.css" rel="stylesheet">
+
 <style>
 
 .node {
@@ -13,13 +29,112 @@
 }
 
 </style>
-<body>
-<script src="js/d3.v3.js"></script>
-<script src="js/fisheye.js"></script>
 
-<p id="authors"/>
+
+  </head>
+
+  <body>
+	<script src="js/d3.v3.js"></script>
+	<script src="js/fisheye.js"></script>
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+      <!-- Begin page content -->
+
+	<div class="container">
+	<div class="row">
+	    <div class="col-md-12">
+              <h1>UCL Information Security Group <small>Collaborations &amp; Publications</small></h1>        
+    	</div>
+	</div>
+
+	  <div class="row">
+        <div class="col-md-6">
+          <p id="authors" style="border: 1px solid #DEDEDE" onresize=""/>
+          <p><small>Hover over the graph of co-authors and venues to see papers. Click to freeze or unfreeze. Reload to change layout. 
+          Data from <a href="http://www.informatik.uni-trier.de/~ley/db/">DBLP</a>; 
+          Javascript from <a href="http://d3js.org/">d3js</a>; 
+          Style from <a href="http://getbootstrap.com">Bootstrap</a>; All original <a href="https://github.com/gdanezis/authorgraph.js">authorgraph.js</a> code is under MIT licence &copy; <a hre="http://www0.cs.ucl.ac.uk/staff/G.Danezis/">George Danezis</a> (2014). </small></p>
+        </div>
+        <div class="col-md-6">
+          <p id="papers"/>
+       </div>
+      </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
 
 <script src="js/graphauthors.js"></script>
 <script>
-  graph_authors("#authors", "data/graph.json", 640, 640);
+  function resize(){
+  	$("#authors").empty();
+  	graph_authors("#authors", "data/graph.json", $("#authors").width(), 600); }
+  resize();
+
+$( window ).resize(function() {
+	console.log("resize window");
+	resize();
+});
+
+$( "body" ).resize(function() {
+	console.log("resize");
+	resize();
+});
+
+  Array.prototype.unique = function() {
+    var unique = [];
+    for (var i = 0; i < this.length; i++) {
+        if (unique.indexOf(this[i]) == -1) {
+            unique.push(this[i]);
+        }
+    }
+    return unique;
+  };
+
+  var datag = null;
+
+  function get_data(){
+	  $.getJSON( "data/index.json", function( data ) {
+	  	datag = data;
+	  	display([]); 
+	  	});
+  }
+
+  function display(k){
+  		var papers = [];
+  		$.each(k, function(key){
+  			innerK = k[key];
+  			papers = papers.concat(datag["index"][innerK]);
+  		});
+  		papers = papers.unique();
+  		// console.log(papers);
+
+		var items = [];
+		$.each( papers, function( key ) {
+			items.push( "" + datag["papers"][papers[key]] );
+		});
+
+
+		$("#papers").empty();
+		$( "<div/>", {
+		"class": "my-new-list",
+		html: items.join( "" )
+		}).appendTo( "#papers" );	   
+  }
+
+  get_data();
+
+  dispatch.on("showpapers", function(keys){
+  	display(keys);
+  });
+  
 </script>
+
+
+  </body>
+</html>
+
+
