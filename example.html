@@ -34,11 +34,6 @@
   </head>
 
   <body>
-	<script src="js/d3.v3.js"></script>
-	<script src="js/fisheye.js"></script>
-	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-
       <!-- Begin page content -->
 
 	<div class="container">
@@ -67,72 +62,20 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
 
+<script src="js/d3.v3.js"></script>
+<script src="js/fisheye.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="js/graphauthors.js"></script>
 <script>
   function resize(){
-  	$("#authors").empty();
   	graph_authors("#authors", "data/graph.json", $("#authors").width(), 600); }
+
   resize();
 
-$( window ).resize(function() {
-	console.log("resize window");
-	resize();
-});
-
-$( "body" ).resize(function() {
-	console.log("resize");
-	resize();
-});
-
-  Array.prototype.unique = function() {
-    var unique = [];
-    for (var i = 0; i < this.length; i++) {
-        if (unique.indexOf(this[i]) == -1) {
-            unique.push(this[i]);
-        }
-    }
-    return unique;
-  };
-
-  var datag = null;
-
-  function get_data(){
-	  $.getJSON( "data/index.json", function( data ) {
-	  	datag = data;
-	  	display([]); 
-	  	});
-  }
-
-  function display(k){
-  		var papers = [];
-  		$.each(k, function(key){
-  			innerK = k[key];
-  			papers = papers.concat(datag["index"][innerK]);
-  		});
-  		papers = papers.unique();
-  		// console.log(papers);
-
-		var items = [];
-		$.each( papers, function( key ) {
-			items.push( "" + datag["papers"][papers[key]] );
-		});
-
-
-		$("#papers").empty();
-		$( "<div/>", {
-		"class": "my-new-list",
-		html: items.join( "" )
-		}).appendTo( "#papers" );	   
-  }
-
-  get_data();
-
-  dispatch.on("showpapers", function(keys){
-  	display(keys);
-  });
-  
+  get_data("data/index.json");
+  set_paperID("#papers")    
 </script>
-
 
   </body>
 </html>

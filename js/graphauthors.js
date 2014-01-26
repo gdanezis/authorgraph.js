@@ -1,7 +1,65 @@
 
 var dispatch = d3.dispatch("showpapers");
 
+$( window ).resize(function() {
+  console.log("resize window");
+  resize();
+});
+
+$( "body" ).resize(function() {
+  console.log("resize");
+  resize();
+});
+
+  Array.prototype.unique = function() {
+    var unique = [];
+    for (var i = 0; i < this.length; i++) {
+        if (unique.indexOf(this[i]) == -1) {
+            unique.push(this[i]);
+        }
+    }
+    return unique;
+  };
+
+  var datag = null;
+
+  function get_data(dataurl){
+    $.getJSON( dataurl, function( data ) {
+      datag = data;
+      display([]); 
+      });
+  }
+
+  function display(paperID, k){
+      var papers = [];
+      $.each(k, function(key){
+        innerK = k[key];
+        papers = papers.concat(datag["index"][innerK]);
+      });
+      papers = papers.unique();
+
+    var items = [];
+    $.each( papers, function( key ) {
+      items.push( "" + datag["papers"][papers[key]] );
+    });
+
+    $(paperID).empty();
+    $( "<div/>", {
+    "class": "my-new-list",
+    html: items.join( "" )
+    }).appendTo( paperID );    
+  }
+
+
+  function set_paperID(paperID){
+    dispatch.on("showpapers", function(keys){
+      display(paperID, keys);
+    });
+  }
+
 function graph_authors(elemID, url, width, height){
+
+$("#authors").empty();
 
 var fisheye = d3.fisheye.circular()
       .radius(240)

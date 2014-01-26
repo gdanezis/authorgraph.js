@@ -3,17 +3,18 @@ from xml.etree import ElementTree
 from collections import Counter
 import json
 
-urls = """
+from bibs import make_index
+import sys
 
-http://www.informatik.uni-trier.de/~ley/pers/xx/d/Danezis:George
-http://www.informatik.uni-trier.de/~ley/pers/xx/c/Cristofaro:Emiliano_De
-http://www.informatik.uni-trier.de/~ley/pers/xx/s/Sasse:Martina_Angela
-http://www.informatik.uni-trier.de/~ley/pers/xx/g/Groth:Jens
-http://www.informatik.uni-trier.de/~ley/pers/xx/p/Pym:David_J=
-http://www.informatik.uni-trier.de/~ley/pers/xx/c/Courtois:Nicolas
 
-""".strip().split("\n")
+if len(sys.argv) > 1:
+    print "DBLP URLs from %s" % sys.argv[1]
+    urls = file(sys.argv[1]).read()
+else:
+    print "DBLP URLs from ../data/urls.txt"
+    urls = file("../data/urls.txt").read()
 
+urls = urls.strip().split("\n")
 
 Core = set()
 Secondary = []
@@ -32,6 +33,7 @@ def ff(x):
     return x
 
 for url in urls:
+    print "Fetching %s ..." % url
     response = requests.get(url)
     tree = ElementTree.fromstring(response.content)
 
@@ -112,7 +114,7 @@ for v in vs:
     if (v in SecondaryV and SecondaryV[v] > 1):
         authorL2 += [{"name": v, "group": 5}]
         continue
-    if vs[v] > 1:
+    if vs[v] > 0:
         authorL2 += [{"name": v, "group": 4}]
     # elif:
     #    authorL2 += [{"name": v, "group": 5}]
@@ -129,7 +131,9 @@ for (a, b) in Venues:
         pass
 
 data = {"nodes": authorL2, "links": linkList}
+index = make_index(records)
 file("../data/graph.json", "w").write(json.dumps(data))
 file("../data/data.json", "w").write(json.dumps(records))
+file("../data/index.json", "w").write(index)
 
 
