@@ -69,8 +69,8 @@ var fisheye = d3.fisheye.circular()
 var color = d3.scale.category20();
 
 var force = d3.layout.force()
-    .charge(-120)
-    .linkDistance(10)
+    .charge(-80)
+    .linkDistance(30)
     .size([width, height]);
 
 var svg = d3.select(elemID)

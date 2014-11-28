@@ -86,7 +86,7 @@ for c in Core:
     authorList += [{"name": c, "group": 1}]
 for c in seclist:
     if c not in Core:
-        if seclist[c] > 1:
+        if seclist[c] > 5:
             authorList += [{"name": c, "group": 2}]
         #else:
         #    authorList += [{"name": c, "group": 3}]
@@ -111,10 +111,10 @@ vs = Counter([v for _, v in Venues])
 SecondaryV = Counter([v for _, v in Counter(Venues)])
 
 for v in vs:
-    if (v in SecondaryV and SecondaryV[v] > 1):
+    if (v in SecondaryV and SecondaryV[v] > 2):
         authorL2 += [{"name": v, "group": 5}]
         continue
-    if vs[v] > 0:
+    if vs[v] > 1:
         authorL2 += [{"name": v, "group": 4}]
     # elif:
     #    authorL2 += [{"name": v, "group": 5}]
